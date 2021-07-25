@@ -46,6 +46,7 @@ func main() {
 		netuserenum      = netapi32.NewProc("NetUserEnum")
 		netapibufferfree = netapi32.NewProc("NetApiBufferFree")
 	)
+	defer netapibufferfree.Call(dataPointer)
 	r1, _, _ := syscall.Syscall9(netuserenum.Addr(), 8,
 		uintptr(0), uintptr(1), uintptr(0),
 		uintptr(unsafe.Pointer(&dataPointer)),
@@ -66,5 +67,4 @@ func main() {
 		fmt.Printf("%d: %v\n", i+1, ByteToStr((*[4096]uint16)(unsafe.Pointer(data.Usri1_name))[:]))
 		iter = uintptr(iter + unsafe.Sizeof(USER_INFO_1{}))
 	}
-	netapibufferfree.Call(dataPointer)
 }
